@@ -16,6 +16,9 @@
 
 	<properties>
 		<java.version>1.8</java.version>
+		<json.version>1.2.66</json.version>
+		<jjwt.version>0.9.1</jjwt.version>
+		<jose.jwt.version>8.2.1</jose.jwt.version>
 	</properties>
 
 	<dependencies>
@@ -68,6 +71,26 @@
 			<groupId>io.swagger</groupId>
 			<artifactId>swagger-annotations</artifactId>
 			<version>1.6.0</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>nimbus-jose-jwt</artifactId>
+			<version>${jose.jwt.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>${jjwt.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>${json.version}</version>
 		</dependency>
 
 	</dependencies>

@@ -1,5 +1,6 @@
 package com.sy.springsecurity.service;
 
+import com.sy.springsecurity.surictiy.SelfUserDetails;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import com.sy.springsecurity.mapper.SecurityUserMapper;
@@ -40,4 +41,7 @@ public class SecurityUserService{
         return securityUserMapper.updateByPrimaryKey(record);
     }
 
+    public SelfUserDetails selectByUserName(String username) {
+        return securityUserMapper.selectByUserName(username);
+    }
 }

@@ -7,16 +7,26 @@
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="user_name" jdbcType="VARCHAR" property="userName" />
     <result column="password" jdbcType="VARCHAR" property="password" />
-    <result column="age" jdbcType="INTEGER" property="age" />
-    <result column="sex" jdbcType="VARCHAR" property="sex" />
   </resultMap>
+
+
+  <resultMap id="userMap"  type="com.sy.springsecurity.surictiy.SelfUserDetails">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <collection   property="authorities" ofType="org.springframework.security.core.authority.SimpleGrantedAuthority">
+      <result column="role_info" property="role"/>
+    </collection>
+  </resultMap>
+
+
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
     id, user_name, `password`, age, sex
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     <!--@mbg.generated-->
-    select 
+    select
     <include refid="Base_Column_List" />
     from security_user
     where id = #{id,jdbcType=INTEGER}
@@ -28,9 +38,9 @@
   </delete>
   <insert id="insert" parameterType="com.sy.springsecurity.domain.SecurityUser">
     <!--@mbg.generated-->
-    insert into security_user (id, user_name, `password`, 
+    insert into security_user (id, user_name, `password`,
       age, sex)
-    values (#{id,jdbcType=INTEGER}, #{userName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=INTEGER}, #{userName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
       #{age,jdbcType=INTEGER}, #{sex,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.sy.springsecurity.domain.SecurityUser">
@@ -99,4 +109,14 @@
       sex = #{sex,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+  <select id="selectByUserName" resultMap="userMap">
+    SELECT  u.id, user_name, `password`,role_info  FROM security_user u
+    left join security_user_role ur on ur.user_id = u.id
+    left join security_role r on ur.role_id = r.id
+    where u.user_name = #{username}
+  </select>
+
+
 </mapper>

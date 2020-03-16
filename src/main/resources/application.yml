@@ -1,6 +1,5 @@
 server:
-  port: 7879
-
+  port: 7870
 spring:
   redis:
     # Redis数据库索引（默认为0）
@@ -34,3 +33,11 @@ spring:
       max-lifetime: 1800000
       connection-timeout: 30000
       connection-test-query: SELECT 1
+
+mybatis:
+  type-aliases-package: com.sy.springsecurity
+  mapper-locations: classpath:mapper/**/*.xml
+
+
+logging:
+  config: classpath:logback-spring.xml

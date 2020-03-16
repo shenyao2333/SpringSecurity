@@ -1,81 +1,94 @@
-package com.sy.springsecurity.domain;
+package com.sy.springsecurity.surictiy;
 
-import io.swagger.annotations.ApiModel;
+import com.sy.springsecurity.domain.SecurityRole;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-@ApiModel(value="SecurityUser")
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * @Author: sy
+ * @DateTime: 2020.3.15 16:20
+ * @Description: 实现security用户对象
+ */
 @Data
-public class SecurityUser implements Serializable , UserDetails {
-    /**
-    * 主键id
-    */
+public class SelfUserDetails  implements UserDetails, Serializable {
+
     @ApiModelProperty(value="主键id")
     private Integer id;
 
     /**
-    * 用户名
-    */
+     * 用户名
+     */
     @ApiModelProperty(value="用户名")
     private String userName;
 
     /**
-    * 密码
-    */
+     * 密码
+     */
     @ApiModelProperty(value="密码")
     private String password;
 
-    /**
-    * 年龄
-    */
-    @ApiModelProperty(value="年龄")
-    private Integer age;
 
     /**
-    * 性别
-    */
-    @ApiModelProperty(value="性别")
-    private String sex;
-
-
+     * 角色列表
+     */
     private List<SecurityRole> roles;
 
-    private static final long serialVersionUID = 1L;
+    private Set<? extends GrantedAuthority> authorities;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> auths = new ArrayList<>();
-        List<SecurityRole> roles = getRoles();
-        for(SecurityRole role : roles)
-        {
-            auths.add(new SimpleGrantedAuthority(role.getRoleName()));
-        }
-        return auths;
+        return this.authorities;
     }
 
+    /**
+     * 密码
+     * @return
+     */
+    @Override
+    public String getPassword() {
+        return this.password;
+    }
+
+    /**
+     * 重点
+     * @return
+     */
     @Override
     public String getUsername() {
         return this.userName;
     }
 
+    /**
+     *是否过期
+     * @return
+     */
     @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+    /**
+     * 用户是否锁定
+     * @return
+     */
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+
+    /**
+     * 用户凭证是否未过期
+     * @return
+     */
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
