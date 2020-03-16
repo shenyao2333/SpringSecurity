@@ -37,7 +37,14 @@ public class SecurityController {
 
     @GetMapping("test")
     public RespBean test(String name){
+        System.out.println(name);
         return  RespBean.success(name);
+    }
+
+
+    @GetMapping("userLogin")
+    public String test2(String name){
+        return name;
     }
 
 

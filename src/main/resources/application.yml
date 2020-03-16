@@ -1,5 +1,5 @@
 server:
-  port: 7870
+  port: 7879
 spring:
   redis:
     # Redis数据库索引（默认为0）

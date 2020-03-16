@@ -36,13 +36,16 @@ public class RedisConfig  extends CachingConfigurerSupport {
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(factory);
+
         // key序列化方式
         template.setKeySerializer(stringRedisSerializer());
         // value序列化
         template.setValueSerializer(jackson2JsonRedisSerializer());
         // value hashmap序列化
+        template.setHashKeySerializer(new StringRedisSerializer());
         template.setHashValueSerializer(jackson2JsonRedisSerializer());
+        template.setConnectionFactory(factory);
+
         return template;
     }
 

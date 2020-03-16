@@ -8,6 +8,7 @@ import com.sy.springsecurity.utils.RespBean;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -20,7 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
+import java.util.*;
 
 /**
  * @Author: sy
@@ -65,11 +66,16 @@ public class SelfAuthenticationEntryPoint implements AuthenticationEntryPoint, A
         SelfUserDetails userDetails = (SelfUserDetails) authentication.getPrincipal();
 
         String token = JwtTokenUtil.createToken(userDetails.getUsername());
-        String s = userDetails.getAuthorities().toString();
-        redisUtil.set(token,s);
+        Map<String, Object> map = new HashMap<>();
+        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+        map.put("roles",JSON.toJSONString(authorities));
+        redisUtil.hmset(token,map,3600*3);
 
-        httpServletResponse.getWriter().write(JSON.toJSONString(RespBean.success(token)));
-
+        Map<String, String> restMap = new HashMap<String, String>();
+        restMap.put("token",token);
+        restMap.put("tokenHead","Bearer");
+        restMap.put("expiresTime",3600*3+"");
+        httpServletResponse.getWriter().write(JSON.toJSONString(RespBean.success(restMap,"登录成功")));
 
     }
 
@@ -114,6 +120,6 @@ public class SelfAuthenticationEntryPoint implements AuthenticationEntryPoint, A
     @Override
     public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AccessDeniedException e) throws IOException, ServletException {
         httpServletResponse.setCharacterEncoding("utf-8");
-        httpServletResponse.getWriter().write(JSON.toJSONString(RespBean.success(RespBean.Code.POWER)));
+        httpServletResponse.getWriter().write(JSON.toJSONString(RespBean.fail(RespBean.Code.POWER)));
     }
 }

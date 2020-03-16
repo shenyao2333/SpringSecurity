@@ -48,7 +48,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic().authenticationEntryPoint(selfAuthenticationEntryPoint)
                 .and()
                 .authorizeRequests()//定义哪些URL需要被保护、哪些不需要被保护
-                .antMatchers("/security/register").hasAnyRole("ADMIN")
+                .antMatchers("/security/register").hasRole("ADMIN")
+                .antMatchers("/security/test").hasRole("USER")
                 .and()
                 .authorizeRequests()
                 //任何请求,登录后可以访问
@@ -90,7 +91,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/userLogin");
+        web.ignoring().antMatchers("/security/userLogin", "/static/**");
     }
 
 
