@@ -22,10 +22,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @Author: sy
@@ -39,8 +36,6 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     @Resource
     private RedisUtil redisUtil;
 
-    @Resource
-    private SelfUserDetailsService userDetailsService;
 
 
     @Override
@@ -54,10 +49,8 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                 log.info("解析后的用户名-->"+username);
                 SelfUserDetails userDetails = new SelfUserDetails();
                 userDetails.setUserName(username);
-                Object roles = hget.get("roles");
-                Set objects =(Set) JSON.parseArray(roles.toString());
-                System.out.println(objects);
-                userDetails.setAuthorities(objects);
+                List<GrantedAuthority> roles = JSON.parseArray(hget.get("roles").toString(), GrantedAuthority.class);
+                userDetails.setAuthorities(new HashSet<>(roles));
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
                 SecurityContextHolder.getContext().setAuthentication(authentication);

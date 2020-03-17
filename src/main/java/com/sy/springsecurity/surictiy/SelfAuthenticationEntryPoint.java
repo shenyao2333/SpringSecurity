@@ -47,7 +47,7 @@ public class SelfAuthenticationEntryPoint implements AuthenticationEntryPoint, A
      */
     @Override
     public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
-        httpServletResponse.setCharacterEncoding("utf-8");
+        httpServletResponse.setContentType("application/json;charset=UTF-8");
         httpServletResponse.setContentType("text/javascript;charset=utf-8");
         httpServletResponse.getWriter().print(JSONObject.toJSONString(RespBean.fail(40001,"请先登录")));
     }
@@ -70,11 +70,11 @@ public class SelfAuthenticationEntryPoint implements AuthenticationEntryPoint, A
         Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
         map.put("roles",JSON.toJSONString(authorities));
         redisUtil.hmset(token,map,3600*3);
-
         Map<String, String> restMap = new HashMap<String, String>();
         restMap.put("token",token);
         restMap.put("tokenHead","Bearer");
         restMap.put("expiresTime",3600*3+"");
+        httpServletResponse.setContentType("application/json;charset=UTF-8");
         httpServletResponse.getWriter().write(JSON.toJSONString(RespBean.success(restMap,"登录成功")));
 
     }
@@ -89,7 +89,7 @@ public class SelfAuthenticationEntryPoint implements AuthenticationEntryPoint, A
      */
     @Override
     public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
-        httpServletResponse.setCharacterEncoding("utf-8");
+        httpServletResponse.setContentType("application/json;charset=UTF-8");
         httpServletResponse.getWriter().write(JSON.toJSONString(RespBean.fail(2000,"帐号或密码错误")));
     }
 
@@ -119,7 +119,7 @@ public class SelfAuthenticationEntryPoint implements AuthenticationEntryPoint, A
      */
     @Override
     public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AccessDeniedException e) throws IOException, ServletException {
-        httpServletResponse.setCharacterEncoding("utf-8");
+        httpServletResponse.setContentType("application/json;charset=UTF-8");
         httpServletResponse.getWriter().write(JSON.toJSONString(RespBean.fail(RespBean.Code.POWER)));
     }
 }
