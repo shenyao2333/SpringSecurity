@@ -59,7 +59,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
 
 
-
                 //开启登录, 定义当需要用户登录时候，转到的登录页面
                 .formLogin()
         //        .loginPage("/test/login.html")
