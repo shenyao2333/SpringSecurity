@@ -67,7 +67,7 @@ public class SelfUserDetails  implements UserDetails, Serializable {
     }
 
     /**
-     *是否过期
+     * 账号是否未过期
      * @return
      */
     @Override

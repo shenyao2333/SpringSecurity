@@ -1,62 +1,77 @@
 package com.sy.springsecurity.surictiy;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.sy.springsecurity.utils.JwtTokenUtil;
-import com.sy.springsecurity.utils.RedisUtil;
-import com.sy.springsecurity.utils.RespBean;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.annotation.Resource;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sy.springsecurity.utils.JwtTokenUtil;
+
+
+
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Component;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
 
 /**
  * @Author: sy
  * @DateTime: 2020.3.15 20:58
- * @Description: 拦截器
+ * @Description: 用户拦截器
  */
-@Component
-@Slf4j
-public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
+public class JwtAuthenticationTokenFilter extends UsernamePasswordAuthenticationFilter  {
 
-    @Resource
-    private RedisUtil redisUtil;
+
+    private AuthenticationManager authenticationManager;
+
+
+
+    public JwtAuthenticationTokenFilter(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+        super.setFilterProcessesUrl("/auth/login");
+    }
 
 
 
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-        String token = JwtTokenUtil.resolveToken(httpServletRequest);
-        log.info("传进来的token---->"+token);
-        if (token!=null){
-            Map<Object, Object> hget = redisUtil.hget(token);
-            if (hget!=null){
-                String username = JwtTokenUtil.getUsername(token);
-                log.info("解析后的用户名-->"+username);
-                SelfUserDetails userDetails = new SelfUserDetails();
-                userDetails.setUserName(username);
-                List<GrantedAuthority> roles = JSON.parseArray(hget.get("roles").toString(), GrantedAuthority.class);
-                userDetails.setAuthorities(new HashSet<>(roles));
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+        // 从输入流中获取到登录的信息
+        try {
+            SelfUserDetails loginUser = new ObjectMapper().readValue(request.getInputStream(), SelfUserDetails.class);
+            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUser.getUsername(), loginUser.getPassword(),loginUser.getAuthorities()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
 
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
+
+    // 成功验证后调用的方法
+    // 如果验证成功，就生成token并返回
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request,
+                                            HttpServletResponse response,
+                                            FilterChain chain,
+                                            Authentication authResult) throws IOException, ServletException {
+
+        SelfUserDetails jwtUser = (SelfUserDetails) authResult.getPrincipal();
+        String token = JwtTokenUtil.createToken(jwtUser.getUsername(),jwtUser.getRoles());
+        // 返回创建成功的token
+        // 但是这里创建的token只是单纯的token
+        // 按照jwt的规定，最后请求的格式应该是 `Bearer token`
+        response.setHeader("Authorization","Bearer "+token);
+    }
+
+    // 这是验证失败时候调用的方法
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        response.getWriter().write("authentication failed, reason: " + failed.getMessage());
+    }
+
+
+
 }

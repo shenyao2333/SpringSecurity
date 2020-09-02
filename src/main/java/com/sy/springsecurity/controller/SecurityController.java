@@ -4,6 +4,7 @@ import com.sy.springsecurity.domain.SecurityUser;
 import com.sy.springsecurity.service.SecurityUserService;
 import com.sy.springsecurity.utils.RespBean;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,8 @@ public class SecurityController {
     private SecurityUserService securityUserService;
 
 
+    @Resource
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
     /**
      * 注册信息
      * @return
@@ -30,6 +33,7 @@ public class SecurityController {
     @ApiOperation(value = "注册用户信息")
     @PostMapping("/register")
     public RespBean register(@RequestBody SecurityUser user){
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         securityUserService.insert(user);
         return  RespBean.success("注册成功");
     }
@@ -42,10 +46,6 @@ public class SecurityController {
     }
 
 
-    @GetMapping("userLogin")
-    public String test2(String name){
-        return name;
-    }
 
 
 

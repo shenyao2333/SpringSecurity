@@ -112,10 +112,10 @@
 
 
   <select id="selectByUserName" resultMap="userMap">
-    SELECT  u.id, user_name, `password`,role_info  FROM security_user u
-    left join security_user_role ur on ur.user_id = u.id
-    left join security_role r on ur.role_id = r.id
-    where u.user_name = #{username}
+    SELECT  u.id, user_name, `password` , enname  FROM user_info u
+    left join auth_user_role ur on ur.user_id = u.id
+    left join auth_role r on ur.role_id = r.id
+      where u.user_name = #{username}
   </select>
 
 

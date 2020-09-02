@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @description 用户登陆处理
  */
 @RestController
-@RequestMapping("/security")
+@RequestMapping("/user")
 public class UserController  {
 
 

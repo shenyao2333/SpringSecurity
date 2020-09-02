@@ -1,6 +1,8 @@
 package com.sy.springsecurity.surictiy;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,7 +11,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.annotation.Resource;
 
@@ -21,17 +22,12 @@ import javax.annotation.Resource;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter  {
 
 
     @Resource
     private SelfUserDetailsService userDetailsService;
 
-    @Resource
-    private SelfAuthenticationEntryPoint selfAuthenticationEntryPoint;
-
-    @Resource
-    private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
     /**
      * 拦截策略
@@ -40,46 +36,26 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        //去掉csrf(跨域请求)
-        http.csrf().disable()
-                //toke、session,使用swt
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .httpBasic().authenticationEntryPoint(selfAuthenticationEntryPoint)
-                .and()
-                .authorizeRequests()//定义哪些URL需要被保护、哪些不需要被保护
-                .antMatchers("/security/register").hasRole("ADMIN")
-                .antMatchers("/security/test").hasRole("USER")
-                .and()
+        http.cors().and().csrf().disable()
                 .authorizeRequests()
-                //任何请求,登录后可以访问
-                .anyRequest()
-                // RBAC 动态 url 认证
-                .access("@rbacauthorityservice.hasPermission(request,authentication)")
+                .antMatchers( "/security/register").hasRole("ADMIN")
+                // 测试用资源，需要验证了的用户才能访问
+                // 其他都放行了
+                .anyRequest().permitAll()
                 .and()
+                .addFilter(new JwtAuthenticationTokenFilter(authenticationManager()))
+                .addFilter(new JWTAuthorizationFilter(authenticationManager()))
+                // 不需要session
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                /*.and()
+                .exceptionHandling().authenticationEntryPoint(new JWTAuthenticationEntryPoint());*/
+                //添加无权限时的处理
+                //.accessDeniedHandler(new JWTAccessDeniedHandler());
+    }
 
-
-                //开启登录, 定义当需要用户登录时候，转到的登录页面
-                .formLogin()
-        //        .loginPage("/test/login.html")
-        //        .loginProcessingUrl("/login")
-                .successHandler(selfAuthenticationEntryPoint)//登录成功
-                .failureHandler(selfAuthenticationEntryPoint)//登录失败
-                .permitAll()
-                .and()
-                .logout()//默认注销行为为logout
-                .logoutUrl("/logout")
-                .logoutSuccessHandler(selfAuthenticationEntryPoint)
-                .permitAll();
-        http.rememberMe().rememberMeParameter("remember-me")
-                .userDetailsService(userDetailsService).tokenValiditySeconds(1000);
-
-        http.exceptionHandling().accessDeniedHandler(selfAuthenticationEntryPoint);// 无权访问 JSON 格式的数据
-        http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
-
-        http.authorizeRequests()
-                .antMatchers( "/resources/**", "/swagger-ui.html", "/swagger-resources/**", "/v2/api-docs")
-                .permitAll().anyRequest().authenticated();
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder(){
+        return new BCryptPasswordEncoder();
     }
 
 
@@ -90,7 +66,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/security/userLogin", "/static/**");
+        web.ignoring().antMatchers("/security/test", "/static/**");
     }
 
 

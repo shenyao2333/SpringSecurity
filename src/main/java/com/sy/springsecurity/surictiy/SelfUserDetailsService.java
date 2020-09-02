@@ -17,7 +17,7 @@ import javax.annotation.Resource;
  */
 @Component
 @Slf4j
-public class SelfUserDetailsService implements UserDetailsService {
+public class SelfUserDetailsService implements UserDetailsService  {
 
 
     @Resource
@@ -27,7 +27,6 @@ public class SelfUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         SelfUserDetails user = securityUserService.selectByUserName(username);
-        log.info("查询出来用户为---->"+user);
         if (user==null){
             throw  new GrabException(4000,"用户不存在");
         }

@@ -65,7 +65,7 @@ public class SelfAuthenticationEntryPoint implements AuthenticationEntryPoint, A
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
         SelfUserDetails userDetails = (SelfUserDetails) authentication.getPrincipal();
 
-        String token = JwtTokenUtil.createToken(userDetails.getUsername());
+        String token = JwtTokenUtil.createToken(userDetails.getUsername(),userDetails.getRoles());
         Map<String, Object> map = new HashMap<>();
         Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
         map.put("roles",JSON.toJSONString(authorities));
