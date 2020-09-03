@@ -19,15 +19,16 @@ import javax.annotation.Resource;
 @RequestMapping("/security")
 public class SecurityController {
 
-
     @Resource
     private SecurityUserService securityUserService;
 
 
     @Resource
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+
     /**
-     * 注册信息
+     * 注册信息 ，这个接口需要登录，并且需要ADMIN权限
      * @return
      */
     @ApiOperation(value = "注册用户信息")
@@ -39,10 +40,28 @@ public class SecurityController {
     }
 
 
+    /**
+     *
+     * @param name
+     * @return
+     */
     @GetMapping("test")
     public RespBean test(String name){
-        System.out.println(name);
         return  RespBean.success(name);
+    }
+
+
+    /**
+     * 这个接口开放
+     * @param user
+     * @return
+     */
+    @PostMapping("/add")
+    @ApiOperation(value = "添加用户")
+    public RespBean add(@RequestBody SecurityUser user){
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        securityUserService.insert(user);
+        return  RespBean.success("添加成功后");
     }
 
 

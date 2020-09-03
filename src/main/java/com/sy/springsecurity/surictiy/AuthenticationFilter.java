@@ -1,17 +1,18 @@
 package com.sy.springsecurity.surictiy;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sy.springsecurity.domain.SecurityUser;
 import com.sy.springsecurity.utils.JwtTokenUtil;
 
 
-
+import com.sy.springsecurity.utils.RespBean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Component;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -23,14 +24,17 @@ import java.io.IOException;
  * @DateTime: 2020.3.15 20:58
  * @Description: 用户拦截器
  */
-public class JwtAuthenticationTokenFilter extends UsernamePasswordAuthenticationFilter  {
+public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter  {
 
 
     private AuthenticationManager authenticationManager;
 
 
-
-    public JwtAuthenticationTokenFilter(AuthenticationManager authenticationManager) {
+    /**
+     *  设置登录路径
+     * @param authenticationManager
+     */
+    public AuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
         super.setFilterProcessesUrl("/auth/login");
     }
@@ -50,26 +54,39 @@ public class JwtAuthenticationTokenFilter extends UsernamePasswordAuthentication
 
     }
 
-    // 成功验证后调用的方法
-    // 如果验证成功，就生成token并返回
+    /**
+     * 登录成功
+     * @param request
+     * @param response
+     * @param chain
+     * @param authResult
+     * @throws IOException
+     * @throws ServletException
+     */
     @Override
     protected void successfulAuthentication(HttpServletRequest request,
                                             HttpServletResponse response,
                                             FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
-
         SelfUserDetails jwtUser = (SelfUserDetails) authResult.getPrincipal();
         String token = JwtTokenUtil.createToken(jwtUser.getUsername(),jwtUser.getRoles());
         // 返回创建成功的token
-        // 但是这里创建的token只是单纯的token
-        // 按照jwt的规定，最后请求的格式应该是 `Bearer token`
-        response.setHeader("Authorization","Bearer "+token);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().print(JSONObject.toJSONString(RespBean.success(token)));
     }
 
-    // 这是验证失败时候调用的方法
+    /**
+     *  这是验证失败时候调用的方法
+     * @param request
+     * @param response
+     * @param failed
+     * @throws IOException
+     * @throws ServletException
+     */
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-        response.getWriter().write("authentication failed, reason: " + failed.getMessage());
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().print(JSONObject.toJSONString(RespBean.fail(20001,"帐号或密码错误！")));
     }
 
 

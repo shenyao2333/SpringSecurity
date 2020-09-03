@@ -4,9 +4,11 @@ import com.sy.springsecurity.domain.SecurityRole;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -38,9 +40,20 @@ public class SelfUserDetails  implements UserDetails, Serializable {
     /**
      * 角色列表
      */
-    private List<SecurityRole> roles;
+    private List roles;
 
     private Set<? extends GrantedAuthority> authorities;
+
+
+
+    public Collection<? extends GrantedAuthority> getAuthoritiesByRoles() {
+        List<GrantedAuthority> auths = new ArrayList<>();
+        List roles = getRoles();
+        for(Object role : roles) {
+            auths.add(new SimpleGrantedAuthority("ROLE_"+role.toString()));
+        }
+        return auths;
+    }
 
 
     @Override

@@ -29,8 +29,8 @@ import java.util.*;
  * @Description: 登录异常处理
  */
 
-@Component
-public class SelfAuthenticationEntryPoint implements AuthenticationEntryPoint, AuthenticationSuccessHandler , AuthenticationFailureHandler, LogoutSuccessHandler , AccessDeniedHandler {
+
+public class SelfAuthenticationEntryPoint implements AuthenticationEntryPoint, AuthenticationSuccessHandler , AuthenticationFailureHandler , AccessDeniedHandler {
 
 
     @Resource
@@ -48,7 +48,6 @@ public class SelfAuthenticationEntryPoint implements AuthenticationEntryPoint, A
     @Override
     public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
         httpServletResponse.setContentType("application/json;charset=UTF-8");
-        httpServletResponse.setContentType("text/javascript;charset=utf-8");
         httpServletResponse.getWriter().print(JSONObject.toJSONString(RespBean.fail(40001,"请先登录")));
     }
 
@@ -94,20 +93,6 @@ public class SelfAuthenticationEntryPoint implements AuthenticationEntryPoint, A
     }
 
 
-    /**
-     * 注销登录
-     * @param httpServletRequest
-     * @param httpServletResponse
-     * @param authentication
-     * @throws IOException
-     * @throws ServletException
-     */
-    @Override
-    public void onLogoutSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
-        String s = JwtTokenUtil.resolveToken(httpServletRequest);
-        redisUtil.del(s);
-        httpServletResponse.getWriter().write(JSON.toJSONString(RespBean.success("注销成功")));
-    }
 
     /**
      * 无权访问

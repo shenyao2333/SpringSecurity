@@ -4,11 +4,11 @@ package com.sy.springsecurity.utils;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
+import com.alibaba.fastjson.JSONObject;
+import com.sy.springsecurity.domain.SecurityUser;
+import com.sy.springsecurity.surictiy.SelfUserDetails;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -34,41 +34,59 @@ public class JwtTokenUtil {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public  static String createToken(String username, List roles) {
+
+    public  static String createToken( String userName ,List roles) {
 
         HashMap<String,Object> map = new HashMap<>();
         map.put("roles",roles);
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
         return Jwts.builder()
-                .setSubject(username)
                 .setClaims(map)
                 .setIssuedAt(now)
                 .setExpiration(validity)
+                .setSubject(userName)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
-    public static String getUsername(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+
+
+    public static SelfUserDetails getUserInfo(String token) {
+        Claims body = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        String subject = body.getSubject();
+        List roles = (List)body.get("roles");
+        SelfUserDetails selfUserDetails = new SelfUserDetails();
+        selfUserDetails.setUserName(subject);
+        selfUserDetails.setRoles(roles);
+        return selfUserDetails;
     }
 
-    public static List getRoles(String token) {
-        return (List)Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().get("roles");
-    }
 
     public static String resolveToken(HttpServletRequest req) {
-        String bearerToken = req.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+        String bearerToken = req.getHeader(TOKEN_HEADER);
+        if (bearerToken != null && bearerToken.startsWith(TOKEN_PREFIX)) {
             return bearerToken.substring(7);
         }
         return null;
     }
 
-    public static boolean validateToken(String token) {
-        Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-        return true;
+    private  static Claims getTokenBody(String token){
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+    }
 
+
+    /**
+     * 是否超时
+     * @param token
+     * @return
+     */
+    public static boolean validateToken(String token) {
+        try {
+            return getTokenBody(token).getExpiration().before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
     }
 
 

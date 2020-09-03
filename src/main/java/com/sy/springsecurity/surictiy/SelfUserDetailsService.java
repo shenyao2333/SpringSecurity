@@ -27,9 +27,7 @@ public class SelfUserDetailsService implements UserDetailsService  {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         SelfUserDetails user = securityUserService.selectByUserName(username);
-        if (user==null){
-            throw  new GrabException(4000,"用户不存在");
-        }
+        log.info("查询出用户---》"+user);
         return user;
     }
 
