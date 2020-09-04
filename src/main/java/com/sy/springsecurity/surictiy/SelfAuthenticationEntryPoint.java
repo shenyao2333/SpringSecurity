@@ -105,6 +105,6 @@ public class SelfAuthenticationEntryPoint implements AuthenticationEntryPoint, A
     @Override
     public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AccessDeniedException e) throws IOException, ServletException {
         httpServletResponse.setContentType("application/json;charset=UTF-8");
-        httpServletResponse.getWriter().write(JSON.toJSONString(RespBean.fail(RespBean.Code.POWER)));
+        httpServletResponse.getWriter().write(JSON.toJSONString(RespBean.fail(4001,"暂无权限！")));
     }
 }

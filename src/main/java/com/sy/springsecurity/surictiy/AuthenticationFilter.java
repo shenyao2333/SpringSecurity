@@ -3,9 +3,7 @@ package com.sy.springsecurity.surictiy;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sy.springsecurity.domain.SecurityUser;
 import com.sy.springsecurity.utils.JwtTokenUtil;
-
 
 import com.sy.springsecurity.utils.RespBean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -44,13 +42,14 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter  
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         // 从输入流中获取到登录的信息
+
+        SelfUserDetails loginUser = null;
         try {
-            SelfUserDetails loginUser = new ObjectMapper().readValue(request.getInputStream(), SelfUserDetails.class);
-            return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUser.getUsername(), loginUser.getPassword(),loginUser.getAuthorities()));
+            loginUser = new ObjectMapper().readValue(request.getInputStream(), SelfUserDetails.class);
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
         }
+        return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUser.getUsername(), loginUser.getPassword(),loginUser.getAuthorities()));
 
     }
 

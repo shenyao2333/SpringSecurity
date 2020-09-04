@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import lombok.Data;
 
-@ApiModel(value="com-sy-springsecurity-domain-SecurityRole")
+@ApiModel(value="SecurityRole")
 @Data
 public class SecurityRole implements Serializable {
     /**

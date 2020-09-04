@@ -6,11 +6,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import java.util.*;
 
-import com.alibaba.fastjson.JSONObject;
-import com.sy.springsecurity.domain.SecurityUser;
 import com.sy.springsecurity.surictiy.SelfUserDetails;
 import io.jsonwebtoken.*;
-import org.springframework.beans.factory.annotation.Value;
+
 
 /**
  * @Author: sy
@@ -19,13 +17,24 @@ import org.springframework.beans.factory.annotation.Value;
  */
 public class JwtTokenUtil {
 
+    /**
+     * 报文头定义
+     */
     public static final String TOKEN_HEADER = "Authorization";
+
+    /**
+     * 根据JWT定义规范，代表着请求头定义的schema。文档：https://jwt.io/introduction/
+     */
     public static final String TOKEN_PREFIX = "Bearer ";
 
-
+    /**
+     * JWT密钥
+     */
     private static String secretKey = "123123";
 
-
+    /**
+     * 有效期定义
+     */
     private static long validityInMilliseconds = 3600000L*3;
 
 
@@ -35,8 +44,13 @@ public class JwtTokenUtil {
     }
 
 
+    /**
+     * 使用用户名和角色列表生成的一个token。具体可以更改
+     * @param userName
+     * @param roles
+     * @return
+     */
     public  static String createToken( String userName ,List roles) {
-
         HashMap<String,Object> map = new HashMap<>();
         map.put("roles",roles);
         Date now = new Date();
@@ -51,7 +65,11 @@ public class JwtTokenUtil {
     }
 
 
-
+    /**
+     * 从token中解密数据
+     * @param token
+     * @return
+     */
     public static SelfUserDetails getUserInfo(String token) {
         Claims body = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
         String subject = body.getSubject();

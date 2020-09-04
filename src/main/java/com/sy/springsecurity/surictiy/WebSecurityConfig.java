@@ -41,7 +41,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter  {
                 .and()
                 /**
                  * 设置指定一个url需要ADMIN权限
-                 * 这里有个坑，这里指定的ADMIN，但交给SpringSecurity的时候需要ROLE_ADMIN
+                 * 这里指定的ADMIN，但交给SpringSecurity的时候需要ROLE_ADMIN
                  */
                 .authorizeRequests()
                 .antMatchers( "/security/register").hasRole("ADMIN")

@@ -16,7 +16,6 @@ public interface SecurityUserMapper {
 
     int updateByPrimaryKey(SecurityUser record);
 
-    SecurityUser findByUserName(String username);
 
     SelfUserDetails selectByUserName(String username);
 }
