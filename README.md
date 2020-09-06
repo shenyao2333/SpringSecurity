@@ -2,11 +2,11 @@
 
 ### 一、简介
 
-        SpringSecurity的核心功能主要是认证、授权和攻击防护。这里主要是以SpringBoot整合SpringSecurity的一个练习，练习前就尽量过一遍它的知识嘛，这样更加有利于理解为什么这么做。
+  SpringSecurity的核心功能主要是认证、授权和攻击防护。这里主要是以SpringBoot整合SpringSecurity+JWT的一个练习，练习前就尽量过一遍它的知识嘛，这样更加有利于理解为什么这么做。
 
 具体其他的介绍可以参考[SpringSecuity中文文档](https://www.springcloud.cc/spring-security-zhcn.html#what-is-acegi-security) 。
 
-以及JWT的一些介绍[SpringSecuity中文文档](https://jwt.io/introduction) 。
+以及JWT的一些介绍[JWT官网文档](https://jwt.io/introduction) 。
 
 这次demo主要实现的功能
 
