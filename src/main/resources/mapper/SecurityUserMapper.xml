@@ -14,13 +14,9 @@
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="user_name" jdbcType="VARCHAR" property="userName" />
     <result column="password" jdbcType="VARCHAR" property="password" />
-    <collection   property="authorities" ofType="org.springframework.security.core.authority.SimpleGrantedAuthority">
-      <result column="enname" property="role"/>
-    </collection>
     <collection   property="roles" ofType="java.lang.String" javaType="java.util.List">
       <result column="enname" />
     </collection>
-
   </resultMap>
 
 

@@ -4,8 +4,8 @@ import com.sy.springsecurity.domain.SecurityUser;
 import com.sy.springsecurity.service.SecurityUserService;
 import com.sy.springsecurity.utils.RespBean;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -67,7 +67,15 @@ public class SecurityController {
 
 
 
-
+    /**
+     * 测试使用注解做权限
+     * @return
+     */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping("/testPoser")
+    public RespBean testPoser(){
+        return  RespBean.success("ADMIN角色");
+    }
 
 
 

@@ -66,7 +66,7 @@ public class JwtTokenUtil {
 
 
     /**
-     * 从token中解密数据
+     * 从token中解密数据后直接返回对象
      * @param token
      * @return
      */

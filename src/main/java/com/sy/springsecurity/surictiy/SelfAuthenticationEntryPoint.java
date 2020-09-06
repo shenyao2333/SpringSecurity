@@ -2,26 +2,16 @@ package com.sy.springsecurity.surictiy;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.sy.springsecurity.utils.JwtTokenUtil;
-import com.sy.springsecurity.utils.RedisUtil;
 import com.sy.springsecurity.utils.RespBean;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
 
 /**
  * @Author: sy
@@ -30,11 +20,8 @@ import java.util.*;
  */
 
 
-public class SelfAuthenticationEntryPoint implements AuthenticationEntryPoint, AuthenticationSuccessHandler , AuthenticationFailureHandler , AccessDeniedHandler {
+public class SelfAuthenticationEntryPoint implements AuthenticationEntryPoint  , AccessDeniedHandler {
 
-
-    @Resource
-    private RedisUtil redisUtil;
 
 
     /**
@@ -51,46 +38,6 @@ public class SelfAuthenticationEntryPoint implements AuthenticationEntryPoint, A
         httpServletResponse.getWriter().print(JSONObject.toJSONString(RespBean.fail(40001,"请先登录")));
     }
 
-
-    /**
-     * 登录后返回对象
-     * @param httpServletRequest
-     * @param httpServletResponse
-     * @param authentication
-     * @throws IOException
-     * @throws ServletException
-     */
-    @Override
-    public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
-        SelfUserDetails userDetails = (SelfUserDetails) authentication.getPrincipal();
-
-        String token = JwtTokenUtil.createToken(userDetails.getUsername(),userDetails.getRoles());
-        Map<String, Object> map = new HashMap<>();
-        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-        map.put("roles",JSON.toJSONString(authorities));
-        redisUtil.hmset(token,map,3600*3);
-        Map<String, String> restMap = new HashMap<String, String>();
-        restMap.put("token",token);
-        restMap.put("tokenHead","Bearer");
-        restMap.put("expiresTime",3600*3+"");
-        httpServletResponse.setContentType("application/json;charset=UTF-8");
-        httpServletResponse.getWriter().write(JSON.toJSONString(RespBean.success(restMap,"登录成功")));
-
-    }
-
-    /**
-     * 登录失败
-     * @param httpServletRequest
-     * @param httpServletResponse
-     * @param e
-     * @throws IOException
-     * @throws ServletException
-     */
-    @Override
-    public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
-        httpServletResponse.setContentType("application/json;charset=UTF-8");
-        httpServletResponse.getWriter().write(JSON.toJSONString(RespBean.fail(2000,"帐号或密码错误")));
-    }
 
 
 

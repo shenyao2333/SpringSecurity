@@ -1,7 +1,6 @@
 package com.sy.springsecurity.surictiy;
 
 import com.sy.springsecurity.service.SecurityUserService;
-import com.sy.springsecurity.utils.GrabException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

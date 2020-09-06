@@ -145,7 +145,11 @@ public class RespBean<T> implements Serializable {
     }
 
     public static <T>  RespBean success(T data) {
-        return new RespBean(200,true, "处理成功",data);
+        return new RespBean<T>(200,true, "处理成功",data);
+    }
+
+    public static <T>  RespBean success(String msg) {
+        return new RespBean<T>(200,true, msg,null);
     }
 
     public static <T>  RespBean success(T data, String msg) {

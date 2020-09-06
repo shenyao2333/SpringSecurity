@@ -1,6 +1,6 @@
 package com.sy.springsecurity.surictiy;
 
-import com.sy.springsecurity.domain.SecurityRole;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -45,7 +45,11 @@ public class SelfUserDetails  implements UserDetails, Serializable {
     private Set<? extends GrantedAuthority> authorities;
 
 
-
+    /**
+     * 这里加上ROLE_，因为交给SpringSecurity的角色用需要ROLE_前缀，
+     * 但我们数据库存的role信息往往不带ROLE_ 前缀。
+     * @return
+     */
     public Collection<? extends GrantedAuthority> getAuthoritiesByRoles() {
         List<GrantedAuthority> auths = new ArrayList<>();
         List roles = getRoles();
